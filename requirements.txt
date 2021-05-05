@@ -1,5 +1,5 @@
-python-telegram-bot
-pyshorteners
-requests
-uuid4
+python-telegram-bot==13.5
+pyshorteners==1.0.1
+requests==2.25.1
+uuid==1.30
 json
