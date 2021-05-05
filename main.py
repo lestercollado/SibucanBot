@@ -201,18 +201,23 @@ def inlinequery(update, context):
         params = {'municipality':municipality_send, 'search': query, 'sort': 'top-rated', 'page_size': 10}
 
     if query == "":
-        results = []
-        return
+        results.append(
+                InlineQueryResultArticle(
+                    id=str(uuid4()),
+                    title="Escriba un texto para buscar en Sibucan",
+                    input_message_content=InputTextMessageContent("Debe escribir un texto para buscar en Sibucan.\nPor ejemplo: @sibucan_bot carpintero")
+                )
+        )
+        update.inline_query.answer(results)
+        return FIRST
 
     response = requests.get('http://sibucan-backend-staging.herokuapp.com/services/', params=params)
     services = response.json()['results']
 
-    print("Query "+query)
-
     if response.json()['count'] != 0:
         for service in services:
             url_service = url_base+str(service["id"])+"/"
-            url_short = short_url(url_base+str(service["id"])+"/")
+            # url_short = short_url(url_base+str(service["id"])+"/")
             if service["open_now"] == True:
                 results.append(
                     InlineQueryResultArticle(
@@ -222,7 +227,7 @@ def inlinequery(update, context):
                         url = url_service,
                         hide_url = True,
                         description = "Teléfonos: " + service["telephone"] + ' ' + service["telephone"]+'\n'+"Ver más",
-                        input_message_content=InputTextMessageContent("<b>"+service["name"]+"</b>\n"+"☎️Teléfonos: " + service["telephone"] + ' ' + service["telephone"]+"\n"+"🕐 Abierto: Sí"+"\n"+"⭐️ "+str(service["average_rating"])+"\n"+"🌐 "+url_short,parse_mode=ParseMode.HTML),
+                        input_message_content=InputTextMessageContent("<b>"+service["name"]+"</b>\n"+"☎️Teléfonos: " + service["telephone"] + ' ' + service["telephone"]+"\n"+"🕐 Abierto: Sí"+"\n"+"⭐️ "+str(service["average_rating"])+"\n"+"🌐 "+url_service,parse_mode=ParseMode.HTML),
                     )
                 )    
             else: 
@@ -234,7 +239,7 @@ def inlinequery(update, context):
                         url = url_service,
                         hide_url = True,
                         description = "Teléfonos: " + service["telephone"] + ' ' + service["telephone"]+'\n'+"Ver más",
-                        input_message_content=InputTextMessageContent("<b>"+service["name"]+"</b>\n"+"☎️ Teléfonos: " + service["telephone"] + ' ' + service["telephone"]+"\n"+"🕐 Abierto: No"+"\n"+"⭐️ "+str(service["average_rating"])+"\n"+"🌐 "+url_short,parse_mode=ParseMode.HTML),
+                        input_message_content=InputTextMessageContent("<b>"+service["name"]+"</b>\n"+"☎️ Teléfonos: " + service["telephone"] + ' ' + service["telephone"]+"\n"+"🕐 Abierto: No"+"\n"+"⭐️ "+str(service["average_rating"])+"\n"+"🌐 "+url_service,parse_mode=ParseMode.HTML),
                     )
                 )    
     else:
@@ -243,7 +248,7 @@ def inlinequery(update, context):
                     id=str(uuid4()),
                     title="No se han encontrado resultados.",
                     description = "Más detalles",
-                    input_message_content=InputTextMessageContent("Intenta cambiar de municipio o modiciar el término de búsqueda.")
+                    input_message_content=InputTextMessageContent("Intenta cambiar de municipio o modificar el término de su búsqueda.")
                 )
         )
 
@@ -275,7 +280,7 @@ if __name__ == '__main__':
             CommandHandler('borrar_municipio', erase_municipality_handler),            
         ],
         states = {
-            FIRST: [
+            FIRST: [ 
                 CommandHandler('elegir_municipio', search_command_handler),
                 CallbackQueryHandler(erase_municipality, pattern='erase_municipality'),
                 CallbackQueryHandler(search_services, pattern='search '+'*'),
