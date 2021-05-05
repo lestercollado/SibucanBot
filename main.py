@@ -196,9 +196,9 @@ def inlinequery(update, context):
     results = []
 
     if municipality_send == 0:
-        params = {'search': query, 'sort': 'top-rated', 'page_size': 10}
+        params = {'search': query, 'sort': 'top-rated', 'page_size': 100}
     else:        
-        params = {'municipality':municipality_send, 'search': query, 'sort': 'top-rated', 'page_size': 10}
+        params = {'municipality':municipality_send, 'search': query, 'sort': 'top-rated', 'page_size': 100}
 
     if query == "":
         results.append(
