@@ -2,7 +2,6 @@ import os
 import pyshorteners
 import json
 import requests
-import logging
 from uuid import uuid4
 from telegram.ext import Updater, CommandHandler, ConversationHandler, Filters, CallbackQueryHandler, InlineQueryHandler, ChosenInlineResultHandler, MessageHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ChatAction, ParseMode, InlineQueryResultArticle, InputTextMessageContent
