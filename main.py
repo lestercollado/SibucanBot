@@ -67,7 +67,8 @@ def help(update, context):
 /borrar_municipio Elimina el filtro de municipio para las búsquedas
 /nosotros Información sobre la plataforma Sibucan
 /emprendedores Información para los emprendedores
-/clientes Información para los clientes''',
+/clientes Información para los clientes
+@sibucan_bot texto Para buscar en Sibucan, sustituya texto por lo que desea buscar''',
         parse_mode=ParseMode.HTML
     )
 
