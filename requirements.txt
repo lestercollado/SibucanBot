@@ -1,0 +1,6 @@
+python-telegram-bot
+pyshorteners
+requests
+logging
+uuid
+json
