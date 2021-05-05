@@ -1,5 +1,5 @@
 python-telegram-bot
 pyshorteners
 requests
-uuid
+uuid4
 json
