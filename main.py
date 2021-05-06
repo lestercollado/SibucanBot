@@ -61,8 +61,7 @@ def start(update, context):
 
 def help(update, context):
     update.message.reply_text(
-        text = '''<b>Ayuda del Bot</b>
-⁉️ ¿Cómo buscar? 👇
+        text = '''⁉️ ¿Cómo buscar? 👇
 @sibucan_bot <em><u>texto</u></em> Buscar en Sibucan, sustituya <em><u>texto</u></em> por el término que desea buscar
 
 <b>Comandos: </b>
