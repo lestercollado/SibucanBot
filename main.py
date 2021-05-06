@@ -12,6 +12,7 @@ FIRST = 1
 
 municipality_send = 0
 url_base = 'https://sibucan-frontend-staging.herokuapp.com/services/'
+offset = 1
 
 #Get the cities from json file
 def getCities():
@@ -67,7 +68,7 @@ def help(update, context):
 /nosotros Información sobre la plataforma Sibucan
 /emprendedores Información para los emprendedores
 /clientes Información para los clientes
-@sibucan_bot texto Para buscar en Sibucan, sustituya texto por lo que desea buscar''',
+@sibucan_bot <em><u>texto</u></em> Buscar en Sibucan, sustituya <em><u>texto</u></em> por el término que desea buscar''',
         parse_mode=ParseMode.HTML
     )
 
@@ -191,16 +192,19 @@ def search_services(update,context):
     return FIRST
 
 def inlinequery(update, context):
+    global offset
+
     query = update.inline_query.query
-
+    
     results = []
-
+    
     if municipality_send == 0:
-        params = {'search': query, 'sort': 'top-rated', 'page_size': 100}
+        params = {'search': query, 'sort': 'top-rated', 'page_size': 10, 'page': offset}
     else:        
-        params = {'municipality':municipality_send, 'search': query, 'sort': 'top-rated', 'page_size': 100}
+        params = {'municipality':municipality_send, 'search': query, 'sort': 'top-rated', 'page_size': 10, 'page': offset}
 
     if query == "":
+        offset = 1
         results.append(
                 InlineQueryResultArticle(
                     id=str(uuid4()),
@@ -212,47 +216,57 @@ def inlinequery(update, context):
         return FIRST
 
     response = requests.get('http://sibucan-backend-staging.herokuapp.com/services/', params=params)
-    services = response.json()['results']
-
-    if response.json()['count'] != 0:
-        for service in services:
-            url_service = url_base+str(service["id"])+"/"
-            # url_short = short_url(url_base+str(service["id"])+"/")
-            if service["open_now"] == True:
-                results.append(
+    
+    if response.status_code == 200:
+        if response.json()['count'] != 0:
+            services = response.json()['results']
+            for service in services:
+                url_service = url_base+str(service["id"])+"/"
+                # url_short = short_url(url_base+str(service["id"])+"/")
+                if service["open_now"] == True:
+                    results.append(
+                        InlineQueryResultArticle(
+                            id=str(uuid4()),
+                            title=service["name"],
+                            thumb_url = service["logo"],
+                            url = url_service,
+                            hide_url = True,
+                            description = "Teléfonos: " + service["telephone"] + ' ' + service["telephone"]+'\n'+"Ver más",
+                            input_message_content=InputTextMessageContent("<b>"+service["name"]+"</b>\n"+"☎️Teléfonos: " + service["telephone"] + ' ' + service["telephone"]+"\n"+"🕐 Abierto: Sí"+"\n"+"⭐️ "+str(service["average_rating"])+"\n"+"🌐 "+url_service,parse_mode=ParseMode.HTML),
+                        )
+                    )    
+                else: 
+                    results.append(
+                        InlineQueryResultArticle(
+                            id=str(uuid4()),
+                            title=service["name"],
+                            thumb_url = service["logo"],
+                            url = url_service,
+                            hide_url = True,
+                            offset = 4,
+                            description = "Teléfonos: " + service["telephone"] + ' ' + service["telephone"]+'\n'+"Ver más",
+                            input_message_content=InputTextMessageContent("<b>"+service["name"]+"</b>\n"+"☎️ Teléfonos: " + service["telephone"] + ' ' + service["telephone"]+"\n"+"🕐 Abierto: No"+"\n"+"⭐️ "+str(service["average_rating"])+"\n"+"🌐 "+url_service,parse_mode=ParseMode.HTML),
+                        )
+                    )    
+            offset = offset + 1
+            update.inline_query.offset=offset
+            update.inline_query.answer(results,next_offset=offset)
+        else:
+            results.append(
                     InlineQueryResultArticle(
                         id=str(uuid4()),
-                        title=service["name"],
-                        thumb_url = service["logo"],
-                        url = url_service,
-                        hide_url = True,
-                        description = "Teléfonos: " + service["telephone"] + ' ' + service["telephone"]+'\n'+"Ver más",
-                        input_message_content=InputTextMessageContent("<b>"+service["name"]+"</b>\n"+"☎️Teléfonos: " + service["telephone"] + ' ' + service["telephone"]+"\n"+"🕐 Abierto: Sí"+"\n"+"⭐️ "+str(service["average_rating"])+"\n"+"🌐 "+url_service,parse_mode=ParseMode.HTML),
+                        title="No se han encontrado resultados.",
+                        description = "Más detalles",
+                        input_message_content=InputTextMessageContent("Intenta cambiar de municipio o modificar el término de su búsqueda.")
                     )
-                )    
-            else: 
-                results.append(
-                    InlineQueryResultArticle(
-                        id=str(uuid4()),
-                        title=service["name"],
-                        thumb_url = service["logo"],
-                        url = url_service,
-                        hide_url = True,
-                        description = "Teléfonos: " + service["telephone"] + ' ' + service["telephone"]+'\n'+"Ver más",
-                        input_message_content=InputTextMessageContent("<b>"+service["name"]+"</b>\n"+"☎️ Teléfonos: " + service["telephone"] + ' ' + service["telephone"]+"\n"+"🕐 Abierto: No"+"\n"+"⭐️ "+str(service["average_rating"])+"\n"+"🌐 "+url_service,parse_mode=ParseMode.HTML),
-                    )
-                )    
+            )
+            update.inline_query.answer(results,next_offset=None)
     else:
-        results.append(
-                InlineQueryResultArticle(
-                    id=str(uuid4()),
-                    title="No se han encontrado resultados.",
-                    description = "Más detalles",
-                    input_message_content=InputTextMessageContent("Intenta cambiar de municipio o modificar el término de su búsqueda.")
-                )
-        )
-
-    update.inline_query.answer(results)
+        offset = 1
+        results = []
+        update.inline_query.answer(results,next_offset=None)
+        return FIRST   
+    
     return FIRST
 
 def short_url(url):
