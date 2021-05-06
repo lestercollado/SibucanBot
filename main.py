@@ -65,7 +65,7 @@ def help(update, context):
 ⁉️ ¿Cómo buscar? 👇
 @sibucan_bot <em><u>texto</u></em> Buscar en Sibucan, sustituya <em><u>texto</u></em> por el término que desea buscar
 <b>Comandos: </b>
-/elegir_municipio Elegir un municipio para filtrar las búsquedas
+/elegir_provincia_municipio Elegir provincia y municipio para filtrar las búsquedas
 /borrar_municipio Elimina el filtro de municipio para las búsquedas
 /nosotros Información sobre la plataforma Sibucan
 /emprendedores Información para los emprendedores
@@ -291,12 +291,12 @@ if __name__ == '__main__':
     dp.add_handler(InlineQueryHandler(inlinequery))  
     dp.add_handler(ConversationHandler(
         entry_points = [
-            CommandHandler('elegir_municipio', search_command_handler),
+            CommandHandler('elegir_provincia_municipio', search_command_handler),
             CommandHandler('borrar_municipio', erase_municipality_handler),            
         ],
         states = {
             FIRST: [ 
-                CommandHandler('elegir_municipio', search_command_handler),
+                CommandHandler('elegir_provincia_municipio', search_command_handler),
                 CallbackQueryHandler(erase_municipality, pattern='erase_municipality'),
                 CallbackQueryHandler(search_services, pattern='search '+'*'),
                 CallbackQueryHandler(keyboard_municipalities, pattern='keyboard_municipalities '+'*'),
