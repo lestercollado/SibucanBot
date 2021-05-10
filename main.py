@@ -352,6 +352,7 @@ if __name__ == '__main__':
         ],
         states = {
             FIRST: [ 
+                CommandHandler('borrar_filtro', erase_municipality_handler),  
                 CommandHandler('filtro_provincia_municipio', search_command_handler),
                 CallbackQueryHandler(erase_municipality, pattern='erase_municipality'),
                 CallbackQueryHandler(search_services, pattern='search '+'*'),
