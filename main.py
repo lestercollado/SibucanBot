@@ -245,8 +245,7 @@ def inlinequery(update, context):
 
         response = requests.get('http://sibucan-backend-staging.herokuapp.com/services/', params=params)
         
-        if response.status_code == 200:
-            print("Mun",municipality_id,"Resultados",response.json()['count'])               
+        if response.status_code == 200:           
             if response.json()['count'] != 0:
                 services = response.json()['results']
                 for service in services:
