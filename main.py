@@ -233,7 +233,7 @@ def inlinequery(update, context):
                     input_message_content=InputTextMessageContent("Debe escribir un texto para buscar en Sibucan.\nPor ejemplo: @sibucan_bot carpintero")
                 )
         )
-        update.inline_query.answer(results,cache_time=1)
+        update.inline_query.answer(results,cache_time=0)
         return FIRST
     else: 
         text = query                   
@@ -270,7 +270,7 @@ def inlinequery(update, context):
                     )                         
                 offset = offset + 1
                 update.inline_query.offset=offset
-                update.inline_query.answer(results,next_offset=offset,cache_time=1)
+                update.inline_query.answer(results,next_offset=offset,cache_time=0)
             else:
                 results.append(
                         InlineQueryResultArticle(
@@ -280,11 +280,11 @@ def inlinequery(update, context):
                             input_message_content=InputTextMessageContent("Intenta cambiar de municipio o modificar el término de su búsqueda.")
                         )
                 )
-                update.inline_query.answer(results,next_offset=None,cache_time=1)
+                update.inline_query.answer(results,next_offset=None,cache_time=0)
         else:
             offset = 1
             results = []
-            update.inline_query.answer(results,next_offset=None,cache_time=1)
+            update.inline_query.answer(results,next_offset=None,cache_time=0)
             return FIRST   
 
         return FIRST
